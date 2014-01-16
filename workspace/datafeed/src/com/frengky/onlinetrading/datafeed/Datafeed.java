@@ -6,6 +6,7 @@ package com.frengky.onlinetrading.datafeed;
 
 import com.frengky.onlinetrading.datafeed.IDatafeed;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.nio.ByteBuffer;
 
@@ -44,6 +45,9 @@ public class Datafeed implements IDatafeed {
             _endOfFeed = true;
             return;
         }
+        
+        processDatafeedReceivedEvent(
+        		new DatafeedReceivedEvent(this, Arrays.copyOf(buffer, length)));
         
         byte[] element;
         
@@ -91,6 +95,12 @@ public class Datafeed implements IDatafeed {
     public synchronized void addDatafeedListener(IDatafeedListener listener) {
     	if(!_datafeedListeners.contains(listener)) {
     		_datafeedListeners.add(listener);
+    	}
+    }
+    
+    public synchronized void removeDatafeedListener(IDatafeedListener listener) {
+    	if(_datafeedListeners.contains(listener)) {
+    		_datafeedListeners.remove(listener);
     	}
     }
     

@@ -21,13 +21,12 @@ import org.apache.mina.filter.logging.LoggingFilter;
  *
  * @author franky
  */
-public class DatafeedTcpServer extends IoHandlerAdapter {
+public class DatafeedTcpServer extends IoHandlerAdapter implements IDatafeedListener {
     
     protected String _host = "0.0.0.0";
     protected int _port = 9010;
     protected IoAcceptor _acceptor;
     protected static Logger log = Logger.getLogger(DatafeedTcpServer.class);
-    protected IDatafeedClient _datafeedClient;
     
     public DatafeedTcpServer() {
         _init();
@@ -43,14 +42,6 @@ public class DatafeedTcpServer extends IoHandlerAdapter {
         _acceptor.setHandler(this);
         _acceptor.getSessionConfig().setReadBufferSize(2048);
         _acceptor.getSessionConfig().setBothIdleTime(30);
-    }
-    
-    public IDatafeedClient getClient() {
-        return _datafeedClient;
-    }
-    
-    public void setClient(IDatafeedClient client) {
-        _datafeedClient = client;
     }
     
     public void listen() {
@@ -69,6 +60,10 @@ public class DatafeedTcpServer extends IoHandlerAdapter {
         _host = host;
         _port = port;
         listen();
+    }
+    
+    public void onDatafeedReceived(DatafeedReceivedEvent e) {
+    	broadcast(e.getBytes());
     }
     
     public void broadcast(Object message) {

@@ -16,4 +16,6 @@ public interface IDatafeed {
     boolean endOfFeed();
     
     void read(byte[] buffer, int offset, int length);
+    void addDatafeedListener(IDatafeedListener listener);
+    void removeDatafeedListener(IDatafeedListener listener);
 }

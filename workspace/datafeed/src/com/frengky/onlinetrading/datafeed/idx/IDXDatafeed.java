@@ -28,13 +28,13 @@ public class IDXDatafeed extends Datafeed {
         }        
         
         // Proceed message here...
-        
+        /**
         String test = "HEAD=";
         test += new String(elements.get(0));
         test += " SEQ=";
         test += new String(elements.get(3));
 
         log.debug(test);
-        
+        **/
     }
 }

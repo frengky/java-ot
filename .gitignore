@@ -1,4 +1,7 @@
 *~
+.classpath
+.project
+.settings
 /bin/*.jar
 /workspace/.metadata
 /workspace/datafeed/bin
