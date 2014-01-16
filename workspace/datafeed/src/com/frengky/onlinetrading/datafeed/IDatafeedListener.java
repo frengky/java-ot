@@ -4,10 +4,12 @@
  */
 package com.frengky.onlinetrading.datafeed;
 
+import java.util.EventListener;
+
 /**
  *
  * @author franky
  */
-public interface IDatafeedListener {
-    
+public interface IDatafeedListener extends EventListener {
+	public void onDatafeedReceived(DatafeedReceivedEvent e);
 }

@@ -5,8 +5,10 @@
 package com.frengky.onlinetrading.datafeed;
 
 import com.frengky.onlinetrading.datafeed.IDatafeed;
+
 import java.util.ArrayList;
 import java.nio.ByteBuffer;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -20,6 +22,8 @@ public class Datafeed implements IDatafeed {
     protected static final int BUFFSIZE = 4096;
     protected ByteBuffer _buffer = ByteBuffer.allocateDirect(BUFFSIZE);
     protected static Logger log = Logger.getLogger(Datafeed.class);
+    
+    private ArrayList<IDatafeedListener> _datafeedListeners = new ArrayList<IDatafeedListener>();
     
     public Datafeed() {
     }
@@ -82,5 +86,27 @@ public class Datafeed implements IDatafeed {
     
     public boolean endOfFeed() {
         return _endOfFeed;
-    }    
+    }
+    
+    public synchronized void addDatafeedListener(IDatafeedListener listener) {
+    	if(!_datafeedListeners.contains(listener)) {
+    		_datafeedListeners.add(listener);
+    	}
+    }
+    
+    @SuppressWarnings("unchecked")
+	private void processDatafeedReceivedEvent(DatafeedReceivedEvent datafeedReceivedEvent) {
+    	ArrayList<IDatafeedListener> tmp;
+    	
+    	synchronized(this) {
+    		if(_datafeedListeners.size() == 0) {
+    			return;
+    		}
+    		tmp = (ArrayList<IDatafeedListener>) _datafeedListeners.clone();
+    	}
+    	
+    	for(IDatafeedListener listener : tmp) {
+    		listener.onDatafeedReceived(datafeedReceivedEvent);
+    	}
+    }
 }
