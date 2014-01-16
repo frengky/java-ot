@@ -1,21 +1,19 @@
-#!/bin/sh
-
 ##
 ## Application Home Directory
 ##
-HOME=/home/frengky/App/online-trading
-
+APP_HOME=/home/frengky/App/online-trading
+APP_CONFIG=$APP_HOME/config
 ##
 ## Java Environment
 ##
 JAVA_HOME=/home/frengky/App/java-6-oracle-x86
-CLASSPATH=$HOME/lib/'*'
-CONFIG_LOG4J=$HOME/config/log4j.properties
+CLASSPATH=$APP_HOME/lib/'*'
+CONFIG_LOG4J=$APP_HOME/config/log4j.properties
 
 ##
 ## Apache ActiveMQ
 ##
-ACTIVEMQ_HOME=$HOME/services/apache-activemq-5.6.0
+ACTIVEMQ_HOME=$APP_HOME/services/apache-activemq-5.6.0
 
 export JAVA_HOME=$JAVA_HOME
 export ACTIVEMQ_HOME=$ACTIVEMQ_HOME
