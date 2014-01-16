@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="help" name="online-trading">
+    <property environment="env"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+
+    <path id="datafeed.classpath">
+        <pathelement location="lib/log4j-1.2.17.jar"/>
+        <pathelement location="lib/mina-core-2.0.4.jar"/>
+    </path>
+
+    <target name="init" />
+    <target name="clean-datafeed">
+        <delete file="bin/datafeed.jar"/>
+        <delete dir="workspace/datafeed/bin"/>
+    </target>
+    <target name="compile-datafeed" depends="clean-datafeed">
+        <mkdir dir="workspace/datafeed/bin" />
+        <javac debug="false" includeantruntime="false" srcdir="workspace/datafeed/src" destdir="workspace/datafeed/bin" source="${source}" target="${target}">
+            <classpath refid="datafeed.classpath"/>
+        </javac>
+    </target>
+    <target name="build-datafeed" depends="clean-datafeed,compile-datafeed">
+        <jar destfile="bin/datafeed.jar" basedir="workspace/datafeed/bin" />
+    </target>
+
+    <target name="clean" depends="clean-datafeed"/>
+    <target name="build" depends="build-datafeed"/>
+
+    <target name="help">
+        <echo message="Hi..."/>
+    </target>
+</project>
+
