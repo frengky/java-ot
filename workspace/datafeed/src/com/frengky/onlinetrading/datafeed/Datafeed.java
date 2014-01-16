@@ -43,6 +43,7 @@ public class Datafeed implements IDatafeed {
     public void read(byte[] buffer, int offset, int length) {
         if(length < 1) {
             _endOfFeed = true;
+            log.debug("Datafeed.read _endOfFeed!");
             return;
         }
         

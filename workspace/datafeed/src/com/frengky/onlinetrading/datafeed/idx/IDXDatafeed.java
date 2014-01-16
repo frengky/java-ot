@@ -21,20 +21,20 @@ public class IDXDatafeed extends Datafeed {
     }
     
     protected void handleElements(ArrayList<byte[]> elements) {
-
+    	super.handleElements(elements);
+    	
         if(_elements.get(4)[0] == IDXDatafeedRecordType.TradingStatus && 
                 _elements.get(5)[0] == IDXDatafeedTradingStatus.EndSendingRecord) {
             _endOfFeed= true;
-        }        
+            log.debug("IDXDatafeed.handleElements _endOfFeed!");
+        }  
         
         // Proceed message here...
-        /**
         String test = "HEAD=";
         test += new String(elements.get(0));
         test += " SEQ=";
         test += new String(elements.get(3));
 
         log.debug(test);
-        **/
     }
 }
