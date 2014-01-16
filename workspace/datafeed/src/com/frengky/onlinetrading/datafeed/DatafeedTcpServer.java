@@ -5,7 +5,9 @@
 package com.frengky.onlinetrading.datafeed;
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
+import java.util.Map;
 import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.core.service.IoAcceptor;
@@ -67,6 +69,26 @@ public class DatafeedTcpServer extends IoHandlerAdapter {
         _host = host;
         _port = port;
         listen();
+    }
+    
+    public void broadcast(Object message) {
+    	if(_acceptor.getManagedSessionCount() < 1) {
+    		return;
+    	}
+    	
+    	Map<Long, IoSession> sessions = _acceptor.getManagedSessions();
+    	for(Map.Entry<Long, IoSession> client : sessions.entrySet()) {
+    		Long id = client.getKey();
+    		IoSession session = client.getValue();
+    		
+			if((session.getAttribute("user") instanceof String) == true) {
+	    		try {
+	    			session.write(message);
+	    		} catch(Exception ex) {
+	    			log.warn("session " + id + ": " + ex.getMessage());
+	    		}
+			}
+    	}
     }
     
     public void stop() {
