@@ -7,7 +7,10 @@ package com.frengky.onlinetrading.datafeed.app;
 import java.net.URI;
 import java.util.Properties;
 import java.io.FileInputStream;
+import java.io.IOException;
+
 import com.frengky.onlinetrading.datafeed.*;
+
 import org.apache.log4j.Logger;
 
 
@@ -22,26 +25,69 @@ public class Client {
     }
     
     public static void main(String[] args) {
-        Properties prop = new Properties();
-        
-        try {
-            String config = System.getProperty("config");
-            log.info("Using configuration " + config);
-            prop.load(new FileInputStream(config));
-            
-            IDatafeedProvider provider = DatafeedProvider.forName("IDX");
-            
-            IDatafeedClient client = provider.getClient(
-                    new URI(prop.getProperty("datafeed.location")));
-            
-            client.setUsername(prop.getProperty("datafeed.user"));
-            client.setPassword(prop.getProperty("datafeed.password"));
-            client.setOption("1");
-            
-            client.connect();
-        }
-        catch(Exception ex) {
-            log.error(ex.getMessage());
+    	String location = null;
+    	String user = null;
+    	String password = null;
+    	String option = null;
+    	
+    	boolean configExist = false;
+
+    	String config = System.getProperty("config");
+    	if(!config.isEmpty()) {
+    		log.info("Using config from file: " + config);
+    		try {
+	    		Properties prop = new Properties();
+	    		prop.load(new FileInputStream(config));
+	    		location = prop.getProperty("datafeed.location");
+	    		user = prop.getProperty("datafeed.user");
+	    		password = prop.getProperty("datafeed.password");
+	    		option = prop.getProperty("datafeed.option");
+	    		
+    			if(password.isEmpty()) {
+    				log.warn("Using empty password?");
+    				password = "";
+    			}
+    			configExist = true;
+    		} catch(IOException ex) {
+    			log.error(ex.getMessage());
+    		}
+    	} else {
+    		location = System.getProperty("datafeed.location");
+    		user = System.getProperty("datafeed.user");
+    		password = System.getProperty("datafeed.password");
+    		option = System.getProperty("datafeed.option");
+    		
+    		if(!location.isEmpty() && !user.isEmpty()) {
+    			if(password.isEmpty()) {
+    				log.warn("Using empty password?");
+    				password = "";
+    			}
+    			log.info("Using config from parameters.");
+    			configExist = true;
+    		}
+    	}
+    	
+        if(configExist) {
+            try {            
+                IDatafeedProvider provider = DatafeedProvider.forName("IDX");
+                
+                IDatafeedClient client = provider.getClient(new URI(location));
+                client.setUsername(user);
+                client.setPassword(password);
+                
+                if(option.isEmpty()) {
+                	log.warn("Datafeed option is not supplied, using 1");
+                	option = "1";
+                }
+                client.setOption(option);
+                
+                client.connect();
+            }
+            catch(Exception ex) {
+                log.error(ex.getMessage());
+            }
+        } else {
+        	log.error("No configuration found!");
         }
     }
 }
