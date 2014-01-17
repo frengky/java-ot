@@ -13,7 +13,6 @@ public class IDXDatafeedTcpClient extends DatafeedTcpClient {
     
     public IDXDatafeedTcpClient(IDatafeed datafeed) {
         _datafeed = datafeed;
-        _init();
     }
     
     public void sessionOpened(IoSession session) {

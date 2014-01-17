@@ -17,6 +17,7 @@ public interface IDatafeedClient {
     
     public void connect();
     public void connect(URI location);
+    public boolean isConnected();
     public void disconnect();
     public void dispose();
 }

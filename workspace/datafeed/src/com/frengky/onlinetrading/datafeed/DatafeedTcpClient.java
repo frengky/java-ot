@@ -2,6 +2,7 @@ package com.frengky.onlinetrading.datafeed;
 
 import java.net.URI;
 import java.net.InetSocketAddress;
+
 import org.apache.log4j.Logger;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.core.future.ConnectFuture;
@@ -16,18 +17,17 @@ public class DatafeedTcpClient extends IoHandlerAdapter implements IDatafeedClie
     protected String _password;
     protected String _option = "1";
     protected URI _location;
+    protected long _connectTimeout = 60000;
     protected IDatafeed _datafeed;
     protected IoConnector _connector;
     protected ConnectFuture _future;
     protected static Logger log = Logger.getLogger(DatafeedTcpClient.class);
     
     public DatafeedTcpClient() {
-        _init();
     }
     
     public DatafeedTcpClient(IDatafeed datafeed) {
         _datafeed = datafeed;
-        _init();
     }
     
     protected void _init() {
@@ -38,6 +38,7 @@ public class DatafeedTcpClient extends IoHandlerAdapter implements IDatafeedClie
         _connector.getSessionConfig().setReadBufferSize(2048);
         _connector.getSessionConfig().setReaderIdleTime(30);
         _connector.setHandler(this);        
+        _connector.setConnectTimeoutMillis(_connectTimeout);
     }
     
     public URI getLocation() {
@@ -80,16 +81,22 @@ public class DatafeedTcpClient extends IoHandlerAdapter implements IDatafeedClie
         _option = option;
     }
     
+    public void setConnectTimeout(long timeoutMilis) {
+    	_connectTimeout = timeoutMilis;
+    }
+    
     public void connect() {
         log.info("Connecting to " + _location.toString() + " ...");
-                
+
+        _init();
         _future = _connector.connect(new InetSocketAddress(_location.getHost(), _location.getPort()));
         _future.awaitUninterruptibly();
         
         if(_future.isConnected()) {
-        	log.info("Connected!");
+        	log.info("Connected");
         } else {
-        	log.error("Connecting failed!");
+        	log.error(_future.getException().getMessage());
+        	_connector.dispose();
         }
     }
     
@@ -105,6 +112,10 @@ public class DatafeedTcpClient extends IoHandlerAdapter implements IDatafeedClie
         } catch(Exception ex) {
             log.error(ex.getMessage());
         }
+    }
+    
+    public boolean isConnected() {
+    	return _future.isConnected();
     }
     
     public void disconnect() {

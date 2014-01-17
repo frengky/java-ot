@@ -6,14 +6,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
-public class DatafeedTcpServer extends IoHandlerAdapter implements IDatafeedListener {
+public class DatafeedTcpServer extends IoHandlerAdapter implements DatafeedStreamListener {
     
     protected String _host = "0.0.0.0";
     protected int _port = 9010;
@@ -55,7 +54,7 @@ public class DatafeedTcpServer extends IoHandlerAdapter implements IDatafeedList
         listen();
     }
     
-    public void onDatafeedReceived(DatafeedReceivedEvent e) {
+    public void onDatafeedStream(DatafeedStreamEvent e) {
     	broadcast(e.getBytes());
     }
     
@@ -72,8 +71,6 @@ public class DatafeedTcpServer extends IoHandlerAdapter implements IDatafeedList
 				String user = (String)session.getAttribute("user");
 	    		try {
 	    			session.write(message);
-	    			// WriteFuture write = session.write(message);
-	    			// write.awaitUninterruptibly();
 	    		} catch(Exception ex) {
 	    			log.error("Failed to contact " + user + ", " + ex.getMessage());
 	    		}

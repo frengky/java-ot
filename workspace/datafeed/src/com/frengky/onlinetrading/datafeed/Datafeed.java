@@ -13,7 +13,7 @@ public class Datafeed implements IDatafeed {
     protected boolean _endOfFeed = false;
     protected static Logger log = Logger.getLogger(Datafeed.class);
     
-    private ArrayList<IDatafeedListener> _datafeedListeners = new ArrayList<IDatafeedListener>();
+    protected ArrayList<DatafeedStreamListener> _streamListeners = new ArrayList<DatafeedStreamListener>();
     
     public Datafeed() {
     	log.info(getVersion());
@@ -35,8 +35,7 @@ public class Datafeed implements IDatafeed {
         }
         
     	_size += length;
-        processDatafeedReceivedEvent(
-        		new DatafeedReceivedEvent(this, Arrays.copyOf(buffer, length)));
+        processStreamEvent(new DatafeedStreamEvent(this, Arrays.copyOf(buffer, length)));
     }
     
     public void reset() {
@@ -48,31 +47,30 @@ public class Datafeed implements IDatafeed {
         return _endOfFeed;
     }
     
-    public synchronized void addDatafeedListener(IDatafeedListener listener) {
-    	if(!_datafeedListeners.contains(listener)) {
-    		_datafeedListeners.add(listener);
+    public synchronized void addStreamListener(DatafeedStreamListener listener) {
+    	if(!_streamListeners.contains(listener)) {
+    		_streamListeners.add(listener);
     	}
     }
     
-    public synchronized void removeDatafeedListener(IDatafeedListener listener) {
-    	if(_datafeedListeners.contains(listener)) {
-    		_datafeedListeners.remove(listener);
+    public synchronized void removeStreamListener(DatafeedStreamListener listener) {
+    	if(_streamListeners.contains(listener)) {
+    		_streamListeners.remove(listener);
     	}
     }
     
     @SuppressWarnings("unchecked")
-	private void processDatafeedReceivedEvent(DatafeedReceivedEvent datafeedReceivedEvent) {
-    	ArrayList<IDatafeedListener> tmp;
+	protected void processStreamEvent(DatafeedStreamEvent streamEvent) {
+    	ArrayList<DatafeedStreamListener> tmp;
     	
     	synchronized(this) {
-    		if(_datafeedListeners.size() == 0) {
+    		if(_streamListeners.size() == 0) {
     			return;
     		}
-    		tmp = (ArrayList<IDatafeedListener>) _datafeedListeners.clone();
+    		tmp = (ArrayList<DatafeedStreamListener>) _streamListeners.clone();
     	}
-    	
-    	for(IDatafeedListener listener : tmp) {
-    		listener.onDatafeedReceived(datafeedReceivedEvent);
+    	for(DatafeedStreamListener listener : tmp) {
+    		listener.onDatafeedStream(streamEvent);
     	}
     }
 }

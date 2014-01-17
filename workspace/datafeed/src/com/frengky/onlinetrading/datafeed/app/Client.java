@@ -6,6 +6,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import com.frengky.onlinetrading.datafeed.*;
+import com.frengky.onlinetrading.datafeed.idx.IDXDatafeed;
+import com.frengky.onlinetrading.datafeed.idx.IDXDatafeedListener;
+import com.frengky.onlinetrading.datafeed.idx.IDXDatafeedTradingStatusEvent;
 
 import org.apache.log4j.Logger;
 
@@ -73,7 +76,9 @@ public class Client {
                 }
                 
                 DatafeedDebugger debug = new DatafeedDebugger();
-                client.getDatafeed().addDatafeedListener(debug);
+                // client.getDatafeed().addStreamListener(debug);
+                ((IDXDatafeed)client.getDatafeed()).addStreamListener(debug);
+                ((IDXDatafeed)client.getDatafeed()).addDatafeedListener(debug);
                 
                 client.connect();
             }
@@ -86,16 +91,26 @@ public class Client {
     }
 }
 
-class DatafeedDebugger implements IDatafeedListener {
+class DatafeedDebugger implements IDXDatafeedListener {
 	private static Logger log = Logger.getLogger(DatafeedDebugger.class);
 	
 	public DatafeedDebugger() {
-	}	
-	public void onDatafeedReceived(DatafeedReceivedEvent e) {
+	}
+	
+	public void onDatafeedStream(DatafeedStreamEvent e) {
 		try {
 			System.out.write(e.getBytes());
 		} catch(Exception ex) {
 			log.error(ex.getMessage());
 		}
-    }                
+    }
+	
+	public void onTradingStatusChanged(IDXDatafeedTradingStatusEvent e) {
+		log.info("Trading status was changed");
+		try {
+			System.out.write(e.getTradingStatus());
+		} catch(Exception ex) {
+			log.error(ex.getMessage());
+		}		
+	}
 }

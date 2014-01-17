@@ -13,6 +13,7 @@ public class DatafeedFileClient extends DatafeedClient implements IDatafeedClien
     protected static final int BUFFSIZE = 4096;
     protected byte[] _buffer = new byte[BUFFSIZE];
     protected static Logger log = Logger.getLogger(DatafeedFileClient.class);
+    protected boolean _isConnected = false;
     
     public DatafeedFileClient() {
     }
@@ -22,6 +23,7 @@ public class DatafeedFileClient extends DatafeedClient implements IDatafeedClien
     }
     
     public void connect() {
+    	_isConnected = false;
         log.info("Opening " + _location.toString() + " ...");
         
         _filename = _location.getPath();
@@ -39,6 +41,8 @@ public class DatafeedFileClient extends DatafeedClient implements IDatafeedClien
                 _stream = new BufferedInputStream(new FileInputStream(_filename));
             }
             
+            _isConnected = true;
+            
             int bRead = 0;
             do {
                 bRead = _stream.read(_buffer, 0, _buffer.length);
@@ -49,6 +53,7 @@ public class DatafeedFileClient extends DatafeedClient implements IDatafeedClien
             log.info("Closing " + _location.toString() + " ...");
         }
         catch(Exception ex) {
+        	_isConnected = false;
             log.error(ex.getMessage());
         }
     }
@@ -73,9 +78,14 @@ public class DatafeedFileClient extends DatafeedClient implements IDatafeedClien
         }
     }
     
+    public boolean isConnected() {
+    	return _isConnected;
+    }
+    
     public void disconnect() {
         try {
             _stream.close();
+        	_isConnected = false;
         }
         catch(Exception ex) {
             log.error(ex.getMessage());

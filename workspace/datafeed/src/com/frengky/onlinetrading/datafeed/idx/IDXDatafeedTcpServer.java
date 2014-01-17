@@ -1,7 +1,9 @@
 package com.frengky.onlinetrading.datafeed.idx;
 
 import com.frengky.onlinetrading.datafeed.DatafeedTcpServer;
+
 import java.nio.charset.Charset;
+
 import org.apache.mina.core.session.IoSession;
 
 public class IDXDatafeedTcpServer extends DatafeedTcpServer {

@@ -8,7 +8,9 @@ public class IDXDatafeed extends Datafeed {
     private ArrayList<byte[]> _elements = new ArrayList<byte[]>(50);
     private static final int BUFFSIZE = 4096;
     private ByteBuffer _buffer = ByteBuffer.allocateDirect(BUFFSIZE);
-	
+    
+    protected ArrayList<IDXDatafeedListener> _datafeedListeners = new ArrayList<IDXDatafeedListener>();
+    
     public IDXDatafeed() {
     	super();
     }
@@ -68,9 +70,8 @@ public class IDXDatafeed extends Datafeed {
     protected void processRecordElement(ArrayList<byte[]> elements) {
         
         if(_elements.get(4)[0] == IDXDatafeedRecordType.TradingStatus) {
-
+        	processTradingStatusEvent(new IDXDatafeedTradingStatusEvent(this, _elements.get(5)[0]));
         	if(_elements.get(5)[0] == IDXDatafeedRecordTradingStatus.EndSendingRecord) {
-            	log.debug("Trading status now is EndSendingRecord");
                 _endOfFeed= true;
         	}
         	
@@ -85,5 +86,32 @@ public class IDXDatafeed extends Datafeed {
 
         log.debug(test);
         **/
+    }
+    
+    public synchronized void addDatafeedListener(IDXDatafeedListener listener) {
+    	if(!_datafeedListeners.contains(listener)) {
+    		_datafeedListeners.add(listener);
+    	}
+    }
+    
+    public synchronized void removeDatafeedListener(IDXDatafeedListener listener) {
+    	if(_datafeedListeners.contains(listener)) {
+    		_datafeedListeners.remove(listener);
+    	}
+    }
+     
+    @SuppressWarnings("unchecked")
+	protected void processTradingStatusEvent(IDXDatafeedTradingStatusEvent tradingStatusEvent) {
+    	ArrayList<IDXDatafeedListener> tmp;
+    	
+    	synchronized(this) {
+    		if(_streamListeners.size() == 0) {
+    			return;
+    		}
+    		tmp = (ArrayList<IDXDatafeedListener>) _datafeedListeners.clone();
+    	}
+    	for(IDXDatafeedListener listener : tmp) {
+    		listener.onTradingStatusChanged(tradingStatusEvent);
+    	}
     }
 }

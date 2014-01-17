@@ -8,6 +8,6 @@ public interface IDatafeed {
     void read(byte[] buffer, int offset, int length);
     void reset();
     boolean endOfFeed();
-    void addDatafeedListener(IDatafeedListener listener);
-    void removeDatafeedListener(IDatafeedListener listener);
+    void addStreamListener(DatafeedStreamListener listener);
+    void removeStreamListener(DatafeedStreamListener listener);
 }

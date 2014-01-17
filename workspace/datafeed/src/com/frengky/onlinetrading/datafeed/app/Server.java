@@ -99,7 +99,7 @@ public class Server {
 		client.setPassword(password);
 		client.setOption(option);
 		
-		client.getDatafeed().addDatafeedListener(server);
+		client.getDatafeed().addStreamListener(server);
 		
 		log.debug("Connecting in 10 seconds...");
 
@@ -108,7 +108,7 @@ public class Server {
 			client.connect();
 		} catch(Exception ex) {
 			log.error(ex.getMessage());
-			client.getDatafeed().removeDatafeedListener(server);
+			client.getDatafeed().removeStreamListener(server);
 			server.stop();
 			return;			
 		}
