@@ -24,7 +24,7 @@ public class Datafeed implements IDatafeed {
     }
     
     public String getVersion() {
-        return "Datafeed 1.0";
+        return "No datafeed version implemented";
     }
     
     public int getSequenceNumber() {
