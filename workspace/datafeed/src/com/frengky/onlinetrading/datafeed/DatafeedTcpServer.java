@@ -12,7 +12,7 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
-public class DatafeedTcpServer extends IoHandlerAdapter implements DatafeedStreamListener {
+public class DatafeedTcpServer extends IoHandlerAdapter implements DatafeedListener {
     
     protected String _host = "0.0.0.0";
     protected int _port = 9010;

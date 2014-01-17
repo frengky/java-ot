@@ -13,7 +13,7 @@ public class Datafeed implements IDatafeed {
     protected boolean _endOfFeed = false;
     protected static Logger log = Logger.getLogger(Datafeed.class);
     
-    protected ArrayList<DatafeedStreamListener> _streamListeners = new ArrayList<DatafeedStreamListener>();
+    protected ArrayList<DatafeedListener> _streamListeners = new ArrayList<DatafeedListener>();
     
     public Datafeed() {
     	log.info(getVersion());
@@ -47,13 +47,13 @@ public class Datafeed implements IDatafeed {
         return _endOfFeed;
     }
     
-    public synchronized void addStreamListener(DatafeedStreamListener listener) {
+    public synchronized void addStreamListener(DatafeedListener listener) {
     	if(!_streamListeners.contains(listener)) {
     		_streamListeners.add(listener);
     	}
     }
     
-    public synchronized void removeStreamListener(DatafeedStreamListener listener) {
+    public synchronized void removeStreamListener(DatafeedListener listener) {
     	if(_streamListeners.contains(listener)) {
     		_streamListeners.remove(listener);
     	}
@@ -61,15 +61,15 @@ public class Datafeed implements IDatafeed {
     
     @SuppressWarnings("unchecked")
 	protected void processStreamEvent(DatafeedStreamEvent streamEvent) {
-    	ArrayList<DatafeedStreamListener> tmp;
+    	ArrayList<DatafeedListener> tmp;
     	
     	synchronized(this) {
     		if(_streamListeners.size() == 0) {
     			return;
     		}
-    		tmp = (ArrayList<DatafeedStreamListener>) _streamListeners.clone();
+    		tmp = (ArrayList<DatafeedListener>) _streamListeners.clone();
     	}
-    	for(DatafeedStreamListener listener : tmp) {
+    	for(DatafeedListener listener : tmp) {
     		listener.onDatafeedStream(streamEvent);
     	}
     }
