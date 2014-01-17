@@ -4,17 +4,13 @@ import com.frengky.onlinetrading.datafeed.IDatafeed;
 
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
 
 public class Datafeed implements IDatafeed {
+    private int _size = 0;
     protected int _sequenceNumber = 0;
-    protected int _size = 0;
     protected boolean _endOfFeed = false;
-    protected ArrayList<byte[]> _elements = new ArrayList<byte[]>(50);
-    protected static final int BUFFSIZE = 4096;
-    protected ByteBuffer _buffer = ByteBuffer.allocateDirect(BUFFSIZE);
     protected static Logger log = Logger.getLogger(Datafeed.class);
     
     private ArrayList<IDatafeedListener> _datafeedListeners = new ArrayList<IDatafeedListener>();
@@ -31,61 +27,21 @@ public class Datafeed implements IDatafeed {
         return _sequenceNumber;
     }
     
-    protected void handleElements(ArrayList<byte[]> elements) {
-    }
-    
     public void read(byte[] buffer, int offset, int length) {
-    	_size += length;
-    	
         if(length < 1) {
             _endOfFeed = true;
             log.debug("No remaining bytes to read, assuming end of feed at " + getSequenceNumber() + " (" + _size + " bytes so far)");
             return;
         }
         
+    	_size += length;
         processDatafeedReceivedEvent(
         		new DatafeedReceivedEvent(this, Arrays.copyOf(buffer, length)));
-        
-        byte[] element;
-        
-        for(int i=offset; i<length; i++) {
-            _buffer.put(buffer[i]);
-            if(buffer[i] == 0x7C) { // Found pipe
-                element = new byte[_buffer.position() - 1];
-                _buffer.position(0);
-                _buffer.get(element, 0, element.length);
-                _buffer.position(0);
-                
-                _elements.add(element);
-            }
-            else if(buffer[i] == 0x0A) { // Found line break
-                element = new byte[_buffer.position()];
-                _buffer.position(0);
-                _buffer.get(element, 0, element.length);
-                _buffer.position(0);
-                
-                _elements.add(element);
-                
-                if(_elements.size() > 4) {
-                    _sequenceNumber++;
-                    handleElements(_elements);
-                }
-                /**
-                else {
-                    for(int x=0; x<_elements.size(); x++) {
-                        log.info("XXX " + (new String(_elements.get(x))).trim());
-                    }
-                }
-                **/
-                _elements.clear();
-            }
-        }
     }
     
     public void reset() {
         _sequenceNumber = 0;
         _endOfFeed = false;
-        _elements.clear();
     }
     
     public boolean endOfFeed() {

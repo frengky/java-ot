@@ -10,7 +10,7 @@ public class IDXDatafeedSimulator extends IDXDatafeed {
     private Date _lastDateTime;
     private SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyyMMddkkmmss");
     
-    protected void handleElements(ArrayList<byte[]> elements) {
+    protected void processRecordElement(ArrayList<byte[]> elements) {
         try {
             if(_lastDateTime == null) {
                 _lastDateTime = getDate(elements.get(1), elements.get(2));
@@ -25,7 +25,7 @@ public class IDXDatafeedSimulator extends IDXDatafeed {
         } catch(Exception ex) {
             log.error(ex.getMessage());
         }
-        super.handleElements(elements);
+        super.processRecordElement(elements);
     }
     
     private Date getDate(byte[] date, byte[] time) throws ParseException {

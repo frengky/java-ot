@@ -71,8 +71,9 @@ public class DatafeedTcpServer extends IoHandlerAdapter implements IDatafeedList
 			if((session.getAttribute("user") instanceof String) == true) {
 				String user = (String)session.getAttribute("user");
 	    		try {
-	    			WriteFuture write = session.write(message);
-	    			write.awaitUninterruptibly();
+	    			session.write(message);
+	    			// WriteFuture write = session.write(message);
+	    			// write.awaitUninterruptibly();
 	    		} catch(Exception ex) {
 	    			log.error("Failed to contact " + user + ", " + ex.getMessage());
 	    		}

@@ -1,6 +1,6 @@
 package com.frengky.onlinetrading.datafeed.idx;
 
-public class IDXDatafeedTradingStatus {
+public class IDXDatafeedRecordTradingStatus {
     public static final byte BeginSendingRecord = 0x31;
     public static final byte Idle = 0x32;
     public static final byte BeginSessionOne = 0x33;
