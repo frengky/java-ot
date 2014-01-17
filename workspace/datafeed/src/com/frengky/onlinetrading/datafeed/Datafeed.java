@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed;
 
 import com.frengky.onlinetrading.datafeed.IDatafeed;
@@ -12,12 +8,9 @@ import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
 
-/**
- *
- * @author franky
- */
 public class Datafeed implements IDatafeed {
     protected int _sequenceNumber = 0;
+    protected int _size = 0;
     protected boolean _endOfFeed = false;
     protected ArrayList<byte[]> _elements = new ArrayList<byte[]>(50);
     protected static final int BUFFSIZE = 4096;
@@ -27,6 +20,7 @@ public class Datafeed implements IDatafeed {
     private ArrayList<IDatafeedListener> _datafeedListeners = new ArrayList<IDatafeedListener>();
     
     public Datafeed() {
+    	log.info(getVersion());
     }
     
     public String getVersion() {
@@ -41,9 +35,11 @@ public class Datafeed implements IDatafeed {
     }
     
     public void read(byte[] buffer, int offset, int length) {
+    	_size += length;
+    	
         if(length < 1) {
             _endOfFeed = true;
-            log.debug("Datafeed.read _endOfFeed!");
+            log.debug("No remaining bytes to read, assuming end of feed at " + getSequenceNumber() + " (" + _size + " bytes so far)");
             return;
         }
         
@@ -73,11 +69,14 @@ public class Datafeed implements IDatafeed {
                 if(_elements.size() > 4) {
                     _sequenceNumber++;
                     handleElements(_elements);
-                } else {
+                }
+                /**
+                else {
                     for(int x=0; x<_elements.size(); x++) {
-                        log.info((new String(_elements.get(x))).trim());
+                        log.info("XXX " + (new String(_elements.get(x))).trim());
                     }
                 }
+                **/
                 _elements.clear();
             }
         }

@@ -1,14 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed;
 
 import java.net.URI;
 import java.net.InetSocketAddress;
 import org.apache.log4j.Logger;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -16,10 +11,6 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
-/**
- *
- * @author franky
- */
 public class DatafeedTcpClient extends IoHandlerAdapter implements IDatafeedClient {
     protected String _username;
     protected String _password;
@@ -41,9 +32,6 @@ public class DatafeedTcpClient extends IoHandlerAdapter implements IDatafeedClie
     
     protected void _init() {
         _connector = new NioSocketConnector();
-        
-        _connector.getFilterChain().addLast("logger", 
-                new LoggingFilter());
         _connector.getFilterChain().addLast("codec", 
                 new ProtocolCodecFilter(new BytesCodecFactory()));
         
@@ -98,10 +86,11 @@ public class DatafeedTcpClient extends IoHandlerAdapter implements IDatafeedClie
         _future = _connector.connect(new InetSocketAddress(_location.getHost(), _location.getPort()));
         _future.awaitUninterruptibly();
         
-        if(!_future.isConnected()) {
-            log.error("Connecting failed!");
+        if(_future.isConnected()) {
+        	log.info("Connected!");
+        } else {
+        	log.error("Connecting failed!");
         }
-        log.info("Connected!");
     }
     
     public void connect(URI location) {
@@ -129,28 +118,28 @@ public class DatafeedTcpClient extends IoHandlerAdapter implements IDatafeedClie
     }
     
     public void sessionOpened(IoSession session) {
+    	log.debug("Session opened");
     }
     
     public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
         if(_datafeed.endOfFeed()) {
-            log.info("End of feed reached ("+ _datafeed.getSequenceNumber() +")");
             session.close(true);
             _connector.dispose();
         }
     }
     
     public void sessionClosed(IoSession session) {
+    	log.debug("Session closed");
     }
     
     public void messageReceived(IoSession session, Object message) {
         byte[] bytesRead = (byte[])message;
         
-        // System.out.println(new String(bytesRead));
         _datafeed.read(bytesRead, 0, bytesRead.length);
     }
     
     public void exceptionCaught(IoSession session, Throwable cause) {
         session.close(true);
-        log.error(cause.getMessage());
+        log.error("Exception caught: " + cause.getMessage());
     }
 }

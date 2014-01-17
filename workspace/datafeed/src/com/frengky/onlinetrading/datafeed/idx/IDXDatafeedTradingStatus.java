@@ -1,13 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed.idx;
 
-/**
- *
- * @author franky
- */
 public class IDXDatafeedTradingStatus {
     public static final byte BeginSendingRecord = 0x31;
     public static final byte Idle = 0x32;

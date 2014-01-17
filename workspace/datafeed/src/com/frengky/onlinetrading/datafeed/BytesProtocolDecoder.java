@@ -1,17 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed;
 
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
-/**
- *
- * @author franky
- */
+
 public class BytesProtocolDecoder extends CumulativeProtocolDecoder {
     private byte[] data;
     

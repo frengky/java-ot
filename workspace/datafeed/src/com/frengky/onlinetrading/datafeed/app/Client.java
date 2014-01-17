@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed.app;
 
 import java.net.URI;
@@ -13,17 +9,12 @@ import com.frengky.onlinetrading.datafeed.*;
 
 import org.apache.log4j.Logger;
 
-
-/**
- *
- * @author franky
- */
 public class Client {
     private static Logger log = Logger.getLogger(Client.class);
     
     public Client() {
     }
-    
+        
     public static void main(String[] args) {
     	String location = null;
     	String user = null;
@@ -74,12 +65,15 @@ public class Client {
                 IDatafeedClient client = provider.getClient(new URI(location));
                 client.setUsername(user);
                 client.setPassword(password);
+                client.setOption(option);
                 
                 if(option.isEmpty()) {
                 	log.warn("Datafeed option is not supplied, using 1");
                 	option = "1";
                 }
-                client.setOption(option);
+                
+                DatafeedDebugger debug = new DatafeedDebugger();
+                client.getDatafeed().addDatafeedListener(debug);
                 
                 client.connect();
             }
@@ -90,4 +84,18 @@ public class Client {
         	log.error("No configuration found!");
         }
     }
+}
+
+class DatafeedDebugger implements IDatafeedListener {
+	private static Logger log = Logger.getLogger(DatafeedDebugger.class);
+	
+	public DatafeedDebugger() {
+	}	
+	public void onDatafeedReceived(DatafeedReceivedEvent e) {
+		try {
+			System.out.write(e.getBytes());
+		} catch(Exception ex) {
+			log.error(ex.getMessage());
+		}
+    }                
 }

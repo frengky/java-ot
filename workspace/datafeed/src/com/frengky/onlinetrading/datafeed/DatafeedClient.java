@@ -1,14 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed;
 
 import java.net.URI;
-/**
- *
- * @author franky
- */
+
 public abstract class DatafeedClient {
     protected String _username;
     protected String _password;

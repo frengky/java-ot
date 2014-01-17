@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed;
 
 import java.net.URI;
@@ -12,10 +8,6 @@ import java.lang.Exception;
 import com.frengky.onlinetrading.datafeed.DatafeedClient;
 import org.apache.log4j.Logger;
 
-/**
- *
- * @author franky
- */
 public class DatafeedFileClient extends DatafeedClient implements IDatafeedClient {
     protected BufferedInputStream _stream;
     protected static final int BUFFSIZE = 4096;
@@ -30,7 +22,7 @@ public class DatafeedFileClient extends DatafeedClient implements IDatafeedClien
     }
     
     public void connect() {
-        log.info("Connecting to " + _location.toString() + " ...");
+        log.info("Opening " + _location.toString() + " ...");
         
         _filename = _location.getPath();
         
@@ -53,8 +45,8 @@ public class DatafeedFileClient extends DatafeedClient implements IDatafeedClien
                 _datafeed.read(_buffer, 0, bRead);
             } while(bRead > 0);
             
-            log.info("End of feed reached ("+ _datafeed.getSequenceNumber() +")");
             _stream.close();
+            log.info("Closing " + _location.toString() + " ...");
         }
         catch(Exception ex) {
             log.error(ex.getMessage());
@@ -63,7 +55,7 @@ public class DatafeedFileClient extends DatafeedClient implements IDatafeedClien
     
     public void connect(URI location) {
         if(!location.getScheme().equalsIgnoreCase("file")) {
-            log.error("Location scheme is not file");
+            log.error("Location not supported, not a file scheme");
             return;
         }
         

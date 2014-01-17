@@ -1,19 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed.idx;
 
 import com.frengky.onlinetrading.datafeed.Datafeed;
 import java.util.ArrayList;
 
-/**
- *
- * @author franky
- */
 public class IDXDatafeed extends Datafeed {
     
     public IDXDatafeed() {
+    	super();
     }
     
     public String getVersion() {
@@ -26,15 +19,16 @@ public class IDXDatafeed extends Datafeed {
         if(_elements.get(4)[0] == IDXDatafeedRecordType.TradingStatus && 
                 _elements.get(5)[0] == IDXDatafeedTradingStatus.EndSendingRecord) {
             _endOfFeed= true;
-            log.debug("IDXDatafeed.handleElements _endOfFeed!");
         }  
         
-        // Proceed message here...
+        // Proceed datafeed raw message here...
+        /**
         String test = "HEAD=";
         test += new String(elements.get(0));
         test += " SEQ=";
         test += new String(elements.get(3));
 
         log.debug(test);
+        **/
     }
 }

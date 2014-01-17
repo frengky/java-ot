@@ -1,17 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed.idx;
 
 import com.frengky.onlinetrading.datafeed.IDatafeed;
 import com.frengky.onlinetrading.datafeed.IDatafeedClient;
 import com.frengky.onlinetrading.datafeed.IDatafeedProvider;
 import java.net.URI;
-/**
- *
- * @author franky
- */
+
 public class IDXDatafeedProvider implements IDatafeedProvider {
     
     public IDXDatafeedProvider() {

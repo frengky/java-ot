@@ -1,17 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed.idx;
 
 import com.frengky.onlinetrading.datafeed.DatafeedTcpServer;
 import java.nio.charset.Charset;
 import org.apache.mina.core.session.IoSession;
 
-/**
- *
- * @author franky
- */
 public class IDXDatafeedTcpServer extends DatafeedTcpServer {
 
     public IDXDatafeedTcpServer() {
@@ -23,15 +15,17 @@ public class IDXDatafeedTcpServer extends DatafeedTcpServer {
         
         String[] logon;
         try {
-            String logonStr = new String((byte[])message, "US-ASCII").trim();
+            String logonStr = new String((byte[])message, "US-ASCII");
+            log.debug(clientHost + " said " + logonStr.trim());
+            
             logon = logonStr.split("\\|", 3);
             if(logon.length < 3 || 
                     logon[0].length() < 1 || 
                     logon[1].length() < 1 || 
                     logon[2].length() < 1)
-                throw new Exception("user, passwd and option expected");
+                throw new Exception("wrong username or password");
         } catch(Exception ex) {
-            log.warn(clientHost + ": Invalid logon format (" + ex.getMessage() + ")");
+            log.error(clientHost + " login failed, " + ex.getMessage());
             session.close(true);
             return;
         }
@@ -40,10 +34,7 @@ public class IDXDatafeedTcpServer extends DatafeedTcpServer {
         String passwd = logon[1];
         String option = logon[2].toLowerCase();
         
-        log.info(clientHost + 
-                ": Logon accepted [user: " + user + 
-                ", passwd: " + passwd + 
-                ", option: " + option + "]");
+        log.info(clientHost + " login success, known as " + user);
         
         session.setAttribute("user", user);
         session.setAttribute("passwd", passwd);
@@ -57,9 +48,9 @@ public class IDXDatafeedTcpServer extends DatafeedTcpServer {
     public void sessionOpened(IoSession session) {
         super.sessionOpened(session);
         
-        String welcomeMsg = "Welcome to datafeed server\r\n";
+        String welcomeMsg = getBanner() + "\r\n";
         session.write(welcomeMsg.getBytes(Charset.forName("US-ASCII")));
-    }    
+    }
     
     public void messageReceived(IoSession session, Object message) {
         if((session.getAttribute("user") instanceof String) == false) {

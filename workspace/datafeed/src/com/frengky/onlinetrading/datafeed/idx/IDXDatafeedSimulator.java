@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed.idx;
 
 import java.util.ArrayList;
@@ -10,10 +6,6 @@ import java.lang.Thread;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
-/**
- *
- * @author franky
- */
 public class IDXDatafeedSimulator extends IDXDatafeed {
     private Date _lastDateTime;
     private SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyyMMddkkmmss");

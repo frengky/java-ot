@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.frengky.onlinetrading.datafeed;
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
@@ -10,17 +6,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
-import org.apache.mina.filter.logging.LoggingFilter;
 
-/**
- *
- * @author franky
- */
 public class DatafeedTcpServer extends IoHandlerAdapter implements IDatafeedListener {
     
     protected String _host = "0.0.0.0";
@@ -34,8 +26,6 @@ public class DatafeedTcpServer extends IoHandlerAdapter implements IDatafeedList
     
     protected void _init() {
         _acceptor = new NioSocketAcceptor();
-        _acceptor.getFilterChain().addLast("logger", 
-                new LoggingFilter());
         _acceptor.getFilterChain().addLast("codec", 
                 new ProtocolCodecFilter(new BytesCodecFactory()));
         
@@ -44,13 +34,16 @@ public class DatafeedTcpServer extends IoHandlerAdapter implements IDatafeedList
         _acceptor.getSessionConfig().setBothIdleTime(30);
     }
     
+    protected String getBanner() {
+    	return "Welcome to datafeed server";
+    }
+    
     public void listen() {
-        log.info("Starting server at " + _host + ":" + _port);
+        log.info("Starting server at " + _host + ", port " + _port + " ...");
         
         try {
             _acceptor.bind(new InetSocketAddress(_host, _port));
-            log.info("Started");
-            
+            log.info("Ready for connection");
         } catch(IOException ex) {
             log.error(ex.getMessage());
         }
@@ -73,14 +66,15 @@ public class DatafeedTcpServer extends IoHandlerAdapter implements IDatafeedList
     	
     	Map<Long, IoSession> sessions = _acceptor.getManagedSessions();
     	for(Map.Entry<Long, IoSession> client : sessions.entrySet()) {
-    		Long id = client.getKey();
     		IoSession session = client.getValue();
     		
 			if((session.getAttribute("user") instanceof String) == true) {
+				String user = (String)session.getAttribute("user");
 	    		try {
-	    			session.write(message);
+	    			WriteFuture write = session.write(message);
+	    			write.awaitUninterruptibly();
 	    		} catch(Exception ex) {
-	    			log.warn("session " + id + ": " + ex.getMessage());
+	    			log.error("Failed to contact " + user + ", " + ex.getMessage());
 	    		}
 			}
     	}
@@ -88,6 +82,7 @@ public class DatafeedTcpServer extends IoHandlerAdapter implements IDatafeedList
     
     public void stop() {
         _acceptor.unbind();
+        log.info("Stopped");
     }
     
     public void dispose() {
@@ -101,22 +96,22 @@ public class DatafeedTcpServer extends IoHandlerAdapter implements IDatafeedList
     }    
     
     public void sessionOpened(IoSession session) {
-        log.info(getHostAddress(session) + ": Connected");
+        log.info(getHostAddress(session) + " session opened");
     }
     
     public void messageReceived(IoSession session, Object message) {
     }
     
     public void sessionIdle(IoSession session, IdleStatus status) {
-        log.info(getHostAddress(session) + ": Idle");
+        log.info(getHostAddress(session) + " idle");
     }
     
     public void sessionClosed(IoSession session) {
-        log.info(getHostAddress(session) + ": Disconnected");        
+        log.info(getHostAddress(session) + " session closed");        
     }    
     
     public void exceptionCaught(IoSession session, Throwable cause) {
         session.close(true);
-        log.error(getHostAddress(session) + ": " + cause.getMessage());
+        log.error(getHostAddress(session) + " exception caught, " + cause.getMessage());
     }
 }
