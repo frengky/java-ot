@@ -5,4 +5,5 @@
 /bin/*.jar
 /workspace/.metadata
 /workspace/datafeed/bin
+/workspace/messaging/bin
 /src
